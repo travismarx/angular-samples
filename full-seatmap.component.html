@@ -1,0 +1,22 @@
+<seat-info-popover-component #seatInfo *ngIf="infoDetailsVisible" (mouseenter)="hoveringAssignedSeat = true"
+    (mouseleave)="hoveringAssignedSeat = false" [details]="seatDetails" [mapId]="seatmapData.id">
+</seat-info-popover-component>
+<div *ngIf="seatAssignmentStep > 0" class="whole-overlay fadeIn"></div>
+<div #seatmapWrapper [style.height.px]="useHeight" class="seatmap-wrapper">
+    <!--<p-menu [model]="mapActions"></p-menu>-->
+    <div *ngIf="seatAssignmentStep > 0" class="selectInstructionBox">
+        <i class="fa fa-info fa-lg" aria-hidden></i> {{instructionText}}
+    </div>
+    <button class="assign-btn" pButton label="{{assignBtnLabel}}" icon="{{assignBtnIcon}}" (click)="handleAssignmentBtnClick()"></button>
+    <button *ngIf="showCancelSelectOption" class="ui-button-danger cancel assign-btn" pButton label="Cancel Selection"
+        icon="fa-times" (click)="cancelSeatSelection()"></button>
+    <!--<seat-info-popover *ngIf="hoverCoords" [scale]="scaleVal" [coords]="hoverCoords"></seat-info-popover>-->
+    <map-zoom-buttons class="pos-fixed" (onZoomIn)="handleZoomIn()" (onZoomOut)="handleZoomOut()"></map-zoom-buttons>
+    <div class="text-center text-danger" *ngIf="imageError">
+        <h3>Error loading seatmap image</h3><i class="fa fa-exclamation-triangle fa-2x"></i>
+    </div>
+    <div #mapSVG class="text-center"></div>
+    <seat-assignments-form *ngIf="selectedSeatsArr.length" [visible]="seatAssignVisible" [mapData]="mapData"
+        [selectedSeats]="selectedSeatsArr" (cancelAssignments)="cancelSeatSelection()">
+    </seat-assignments-form>
+</div>

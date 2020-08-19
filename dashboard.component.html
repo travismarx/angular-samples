@@ -1,0 +1,85 @@
+<chat-component [visible]="showChat | async" [leagueList]="userLeagues | async"></chat-component>
+<signup-modal
+  [modalSeen]="modalSeen | async"
+  [show]="showSignupModal | async"
+  (close)="closeSignupModal()"
+  (signup)="signupModalSuccess()"
+></signup-modal>
+
+<tab-options
+  [option]="'dashboard'"
+  [selected]="selectedTab | async"
+  (selectTab)="selectTab($event)"
+></tab-options>
+
+<div class="dashboard" [ngClass]="{ 'chat-open': showChat | async }">
+  <head-frame
+    [title]="!(dashboardData | async)?.raceIsLive ? 'No Live Race' : (liveData | async)?.E"
+    [deadline]="(dashboardData | async)?.deadline"
+    [deadlineExpired]="deadlineExpired | async"
+    [toggleOpen]="showChat | async"
+    [liveTiming]="(dashboardData | async)?.raceIsLive"
+    (onToggle)="toggleChat()"
+  >
+  </head-frame>
+
+  <dashboard-news
+    *ngIf="(dashboardData | async)?.news"
+    class="fadeIn"
+    [news]="(dashboardData | async)?.news"
+    [championshipMember]="championshipMember | async"
+    (btnClick)="logJoinClick($event)"
+  ></dashboard-news>
+
+  <!-- <dashboard-news></dashboard-news> -->
+
+  <div class="championship-status">
+    <span class="text">Current Championship League Status: </span>
+    <span
+      class="status"
+      [ngClass]="{
+        'status-joined': championshipMember | async,
+        'status-not-joined': !(championshipMember | async)
+      }"
+    >
+      {{ (championshipMember | async) ? "JOINED" : "NOT JOINED" }}
+    </span>
+    <br />
+    <div *ngIf="!(championshipMember | async)" style="margin-top: 10px; font-size: 1.2em">
+      <a routerLink="/championship/join" class="linkify-text-alt">Click here to join now!</a>
+    </div>
+  </div>
+
+  <!-- USE AREA FOR ANNOUNCEMENTS -->
+  <!-- <div class="ui-g-12 text-center" *ngIf="!(championshipMember | async)">
+    <h3>
+      Play Monster Cup for a chance to win $100!
+      <a routerLink="/mec" class="linkify-text-alt">Click here for info!</a>
+    </h3>
+    <br />
+     Don't worry, the site is still free to play if you don't want to win any prizes.
+  </div> -->
+
+  <div class="loading-container" *ngIf="(loading | async) && !(dashboardError | async)">
+    <!-- <p-progressSpinner></p-progressSpinner> -->
+    <loading-spinner size="md"></loading-spinner>
+  </div>
+
+  <div class="text-center text-danger" *ngIf="!(loading | async) && !(dashboardLoaded | async)">
+    <h3>Error loading dashboard</h3>
+  </div>
+
+  <div *ngIf="dashboardLoaded | async" class="fadeIn">
+    <non-live-dashboard
+      *ngIf="!(dashboardData | async)?.raceIsLive"
+      [data]="dashboardData | async"
+      [siteVariables]="siteVariables | async"
+      [embedDimensions]="embedDimensions"
+    ></non-live-dashboard>
+    <live-race-dashboard
+      *ngIf="(dashboardData | async)?.raceIsLive"
+      class="fadeIn"
+      [@enterAnimation]
+    ></live-race-dashboard>
+  </div>
+</div>
